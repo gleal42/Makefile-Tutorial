@@ -45,3 +45,25 @@ will now compile
 `gcc -Wall -Wextra -Werror test.c -c -o test`
 
 which means that we can create something useful without writing much.
+
+
+```
+CC = c++
+CFLAGS := -Wall -Wextra -Werror -std=c++98
+CXXFLAGS := -Wall -Wextra -Werror -std=c++98
+LDFLAGS := -Wall -Wextra -Werror -std=c++98
+SRCS := megaphone.cpp
+OBJS := $(SRCS:.cpp=.o)
+INC := $(SRCS:.cpp=.hpp)
+NAME := megaphone
+all: $(NAME)
+$(NAME): $(OBJS)
+$(OBJS): $(SRCS) Makefile $(INC)
+clean:
+	$(RM) $(OBJS)
+fclean: clean
+	$(RM) $(NAME)
+re: fclean all
+.PHONY: all clean fclean re
+.SUFFIXES: .o .cpp
+```
