@@ -67,3 +67,10 @@ re: fclean all
 .PHONY: all clean fclean re
 .SUFFIXES: .o .cpp
 ```
+
+
+### Other References:
+
+- https://stackoverflow.com/questions/36209876/generating-dependency-files-in-separate-folder
+- https://stackoverflow.com/questions/66118766/what-is-include-in-gnu-make-and-how-it-works
+- http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
