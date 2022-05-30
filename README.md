@@ -97,32 +97,144 @@ On the following chapter I will show you different ways of compiling more than o
 
 ### Example 2 - Multiple Sources
 
+Files: main.c test.c
+Header files: test.h
+Program to be created: main
+
+**main.c**
+```
+#include "test.h"
+
+int	main(void)
+{
+	test_print("Hello\n");
+}
+```
+
+**test.h**
+```
+#ifndef TEST_H
+#define TEST_H
+
+#include <stdio.h>
+void	test_print();
+
+#endif
+```
+**test.c**
+```
+#include "test.h"
+
+void	test_print()
+{
+	printf("Hello\n");
+}
+```
+
+So now we have a more complex situation, because main.c calls for a function that is in test.c
+
+And we can choose one of 2 simple makefiles:
+
+**Makefile 1**
+```
+main: test.c
+```
+
+**Makefile 2**
+```
+main: main.o test.o
+```
+
+> Note: For some reason if we didn't add main.o it would execute `cc     -c -o test.o test.c` `cc     main.c test.o   -o main`, not matching the example given in [make documentation](https://www.gnu.org/software/make/manual/html_node/Catalogue-of-Rules.html#Catalogue-of-Rules) when referring to "Linking a single object file".
+
+Now at first glance it may appear that the first option is better since we need to write less.<br>
+However, right now we are dealing with only 2 source files. 
+
+Now imagine a project with 20 files `a.c b.c c.c d.c ...` <br>
+Choosing the first option would mean that we would always recompile source files `a.c b.c c.c d.c ...`, even if only one of those sources was changed.
+
+By using the 2nd option, if we change a.c, only a.o will be created and then we relink all o files.
 
 ### Example 3 - 42 Requirements
 
-- Compiler - gcc
+- Compiler - (before it was gcc and now cc).
 - Flags - -Wall -Wextra -Werror (you can add more if you want)
-- There must exist the rules all clean fclean re
+- There must exist the rules $(NAME) all clean fclean re
 - The program must not relink
 
-The rules given are just the standard [.PHONY conventions](https://www.oreilly.com/library/view/managing-projects-with/0596006101/ch02.html)<br>
+#### Compiler
 
-According to [this link](https://docs.oracle.com/cd/E19504-01/802-5880/6i9k05dhg/index.html), `LINK.c` will be replaced by:<br>
-`$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)`, which are by default:
-CC=cc
+So now we are using 2 different implicit rules:
 
-This means that we can simply change the Variables CC, CPPFLAGS and CFLAGS to fit our needs:
+%.o: %.c <br>
+	$(COMPILE.c) $(OUTPUT_OPTION) $<<br>
+
+%: %.o <br>
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@<br>
+
+COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c <br>
+OUTPUT_OPTION = -o $@ <br>
+LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH) <br>
+CC=cc <br>
+And the remaining rules are blank.
+
+So instead of writing our own rules, we can simply modify the variables that already exist:
+
+If we want to change the compiler from cc to gcc:
+
+**Makefile**
+```
+CC=gcc
+main: main.o test.o
+```
+Will output:<br>
+`gcc    -c -o main.o main.c`<br>
+`gcc    -c -o test.o test.c`<br>
+`gcc   main.o test.o   -o main`<br>
+
+#### Flags
+
+If we want to add the 42 required flags:<br>
 **Makefile**
 ```
 CC=gcc
 CFLAGS= -Wall -Wextra -Werror
-main:
+LDFLAGS = $(CFLAGS)
+main: main.o test.o
 ```
 
-will now compile
-`gcc -Wall -Wextra -Werror main.c -o main`
+Will output:<br>
+`gcc -Wall -Wextra -Werror   -c -o main.o main.c`<br>
+`gcc -Wall -Wextra -Werror   -c -o test.o test.c`<br>
+`gcc -Wall -Wextra -Werror  main.o test.o   -o main`<br>
 
-which means that we can create something useful without writing much.
+
+#### There must exist the rules $(NAME) all clean fclean re
+
+#### "The Program must not relink"
+
+What this essentially means is that we type the command `make` multiple times there won't be a new recompilation and linkage.
+
+`make: Nothing to be done for 'rule'.`
+
+This one of the main things that distinguishes Makefile from a bash script. If we don't need to recompile then we won't do it.
+
+The main reasons why I see this happening is:
+
+##### 1. Deleting or moving object files
+
+I get it.. .o files are hard to look at. However, if you always get rid of them by default then might as well compile directly (like we saw on previous chapters).
+
+However if you write this:
+
+```
+CC=gcc
+CFLAGS= -Wall -Wextra -Werror
+LDFLAGS = $(CFLAGS)
+main: main.o test.o
+```
+
+The rules given are just the standard [.PHONY conventions](https://www.oreilly.com/library/view/managing-projects-with/0596006101/ch02.html)<br>
 
 > Tip: If you ever want to see what the Makefile is doing under the hood make sure to type `make -d` (d stands for debug)
 
@@ -134,3 +246,4 @@ which means that we can create something useful without writing much.
 - https://stackoverflow.com/questions/66118766/what-is-include-in-gnu-make-and-how-it-works
 - http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
 - https://stackoverflow.com/questions/52034997/how-to-make-makefile-recompile-when-a-header-file-is-changed
+- https://docs.oracle.com/cd/E19504-01/802-5880/6i9k05dhg/index.html
