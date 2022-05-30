@@ -1,6 +1,6 @@
 ## Makefile Tutorial
 
-Some things I which I new about Makefile when I first started using them. Please feel free to pull request and suggest improvements.
+Some things I wish I knew about Makefiles when I first started using them. Please feel free to pull request and suggest improvements.
 
 ## Topics that will be covered
 
