@@ -147,7 +147,8 @@ main: main.o test.o
 
 > Note: For some reason if we didn't add main.o it would execute `cc     -c -o test.o test.c` `cc     main.c test.o   -o main`, not matching the example given in [make documentation](https://www.gnu.org/software/make/manual/html_node/Catalogue-of-Rules.html#Catalogue-of-Rules) when referring to "Linking a single object file".
 
-Now at first glance it may appear that the first option is better since we need to write less.<br>
+Now at first glance it may appear that the first option is better since we need to write less and even the Makefile [seems to prefer it](https://stackoverflow.com/questions/55727692/how-does-make-build-an-executable-file-from-a-c-source-file-when-the-implicit-ru).<br>
+
 However, right now we are dealing with only 2 source files. 
 
 Now imagine a project with 20 files `a.c b.c c.c d.c ...` <br>
@@ -208,8 +209,38 @@ Will output:<br>
 `gcc -Wall -Wextra -Werror   -c -o test.o test.c`<br>
 `gcc -Wall -Wextra -Werror  main.o test.o   -o main`<br>
 
-
 #### There must exist the rules $(NAME) all clean fclean re
+
+Most of these rules are [Standard Conventions](https://www.oreilly.com/library/view/managing-projects-with/0596006101/ch02.html)<br>
+
+$(NAME) - Name of the program
+all - Do all tasks to build program
+clean - Delete binaries generated from sources (.o files)
+fclean - Equivalent to distclean (remove all files produced by Makefile)
+re - Though not standard rule means to remove all files and rebuild the program
+
+$(NAME) represents a file (executable)
+all, clean, fclean, re don't represent files.
+
+In order to stop Makefile from trying to create files with these names we must add them as Phony Targets: <br>
+
+**Makefile**
+```
+CC=gcc
+CFLAGS= -Wall -Wextra -Werror
+LDFLAGS = $(CFLAGS)
+$(NAME)=main
+all: $(NAME)
+$(NAME): main.o test.o
+clean:
+	$(RM) *.o
+fclean: clean
+	$(RM) $(NAME)
+re: fclean all
+.PHONY: all clean fclean re
+```
+
+> Tip: If you ever want to see what the Makefile is doing under the hood make sure to type `make -d` (d stands for debug)
 
 #### "The Program must not relink"
 
@@ -225,20 +256,23 @@ The main reasons why I see this happening is:
 
 I get it.. .o files are hard to look at. However, if you always get rid of them by default then might as well compile directly (like we saw on previous chapters).
 
-However if you write this:
-
+**Makefile that deletes .o files**
 ```
-CC=gcc
-CFLAGS= -Wall -Wextra -Werror
-LDFLAGS = $(CFLAGS)
-main: main.o test.o
+...
+all: $(NAME) clean
+...
 ```
 
-The rules given are just the standard [.PHONY conventions](https://www.oreilly.com/library/view/managing-projects-with/0596006101/ch02.html)<br>
-
-> Tip: If you ever want to see what the Makefile is doing under the hood make sure to type `make -d` (d stands for debug)
-
-(https://stackoverflow.com/questions/55727692/how-does-make-build-an-executable-file-from-a-c-source-file-when-the-implicit-ru)
+**Makefile that moves .o files**
+```
+...
+$(NAME): main.o test.o | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $^ -o $@
+	mv *.o $(OBJ_DIR)
+$(OBJ_DIR):
+	mkdir $@
+...
+```
 
 ### Other References:
 
