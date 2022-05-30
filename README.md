@@ -52,11 +52,13 @@ target: normal pre-req | order-only pre-req
 	recipes
 ```
 
-Target is the thing we want to create (or the name of the rule).<br>
-Pre-requisites are the thing on which the target depends on:<br>
-- For normal pre-requisites the target needs to be rebuilt if they are updated.<br>
-- For order-only pre-requisites, these rules only run once, in case these requirements don't exist (e.g. directories only need to be built once).<br>
-Recipes are a series of commands we want to run.
+- Target is the thing we want to create (or the name of the rule).<br>
+- Pre-requisites are the thing on which the target depends on:<br>
+  - For normal pre-requisites the target needs to be rebuilt if they are updated.<br>
+  - For order-only pre-requisites, these rules only run once, in case these requirements don't exist (e.g. directories only need to be built once).<br>
+- Recipes are a series of commands we want to run.
+- % is a wildcard, meaning it can be replaced by any combination of characters. When there are 2 % signs, the second one will be replace by the same combination of characters as the first one (i.e. they must match).
+
 
 ### Example 1 - The Simplest Makefile
 
@@ -93,7 +95,7 @@ LINK.c = cc <br>
 $^ = main.c (all pre-requirements) <br>
 $@ = main (target)<br>
 
-> Tip: $^ $@ $<.. are called [automatic variables](https://www.gnu.org/software/make/manual/make.html#Automatic-Variables)
+> Tip: `$^ $@ $<..` are called [automatic variables](https://www.gnu.org/software/make/manual/make.html#Automatic-Variables)
 
 On the following chapter I will show you different ways of compiling more than one source and explain which one I believe is the best and why.
 
