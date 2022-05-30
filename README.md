@@ -5,10 +5,9 @@ Some things I wish I knew about Makefiles when I first started using them. Pleas
 ## Topics that will be covered
 
 1. [Introduction](#1-introduction)
-2. [Implicit Rules](#2-implicit-rules)
-   - [Example 1 - The Simplest Makefile](#example-1---the-simplest-makefile)
-   - [Example 2 - Multiple Sources](#example-2---multiple-sources)
-   - [Example 3 - 42 Requirements](#example-3---42-requirements)
+2. [The Simplest Makefile - Intro to Implicit Rules](#2-the-simplest-makefile---intro-to-implicit-rules)
+3. [Building executable from Multiple Sources](#3-building-executable-from-multiple-sources)
+4. [42 Requirements](#4-42-requirements)
 
 ### 1. Introduction
 
@@ -30,7 +29,7 @@ Once we create a Makefile document, when we type the command `make`, it will exe
 I will focus on **C** and **CPP** compilation (using gcc and c++ compilers), since these are taught at the coding school I'm studying in (School 42) however the contents might still apply to the compilation of other languages.
 
 
-### 2. Implicit Rules
+### 2. The Simplest Makefile - Intro to Implicit Rules
 
 The Makefile was made already with [certain programming languages](http://gnu.ist.utl.pt/software/autoconf/manual/make/Catalogue-of-Rules.html) in mind.
 
@@ -58,9 +57,6 @@ target: normal pre-req | order-only pre-req
   - For order-only pre-requisites, these rules only run once, in case these requirements don't exist (e.g. directories only need to be built once).<br>
 - Recipes are a series of commands we want to run.
 - % is a wildcard, meaning it can be replaced by any combination of characters. When there are [2 % signs](https://stackoverflow.com/questions/7404444/what-does-a-percent-symbol-do-in-a-makefile), the second one will be replace by the same combination of characters as the first one (i.e. they must match).
-
-
-### Example 1 - The Simplest Makefile
 
 File: main.c
 Program to be created: main
@@ -98,8 +94,6 @@ $@ = main (target)<br>
 > Tip: `$^ $@ $<..` are called [automatic variables](https://www.gnu.org/software/make/manual/make.html#Automatic-Variables)
 
 On the following chapter I will show you different ways of compiling more than one source and explain which one I believe is the best and why.
-
-
 
 ### Example 2 - Multiple Sources
 
