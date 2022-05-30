@@ -57,7 +57,7 @@ target: normal pre-req | order-only pre-req
   - For normal pre-requisites the target needs to be rebuilt if they are updated.<br>
   - For order-only pre-requisites, these rules only run once, in case these requirements don't exist (e.g. directories only need to be built once).<br>
 - Recipes are a series of commands we want to run.
-- % is a wildcard, meaning it can be replaced by any combination of characters. When there are 2 % signs, the second one will be replace by the same combination of characters as the first one (i.e. they must match).
+- % is a wildcard, meaning it can be replaced by any combination of characters. When there are [2 % signs](https://stackoverflow.com/questions/7404444/what-does-a-percent-symbol-do-in-a-makefile), the second one will be replace by the same combination of characters as the first one (i.e. they must match).
 
 
 ### Example 1 - The Simplest Makefile
@@ -122,37 +122,16 @@ This means that we can simply change the Variables CC, CPPFLAGS and CFLAGS to fi
 ```
 CC=gcc
 CFLAGS= -Wall -Wextra -Werror
-test:
+main:
 ```
 
 will now compile
-`gcc -Wall -Wextra -Werror test.c -c -o test`
+`gcc -Wall -Wextra -Werror main.c -o main`
 
 which means that we can create something useful without writing much.
 
 > Tip: If you ever want to see what the Makefile is doing under the hood make sure to type `make -d` (d stands for debug)
 
-
-```
-CC = c++
-CFLAGS := -Wall -Wextra -Werror -std=c++98
-CXXFLAGS := -Wall -Wextra -Werror -std=c++98
-LDFLAGS := -Wall -Wextra -Werror -std=c++98
-SRCS := megaphone.cpp
-OBJS := $(SRCS:.cpp=.o)
-INC := $(SRCS:.cpp=.hpp)
-NAME := megaphone
-all: $(NAME)
-$(NAME): $(OBJS)
-$(OBJS): $(SRCS) Makefile $(INC)
-clean:
-	$(RM) $(OBJS)
-fclean: clean
-	$(RM) $(NAME)
-re: fclean all
-.PHONY: all clean fclean re
-.SUFFIXES: .o .cpp
-```
 (https://stackoverflow.com/questions/55727692/how-does-make-build-an-executable-file-from-a-c-source-file-when-the-implicit-ru)
 
 ### Other References:
